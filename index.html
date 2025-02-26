@@ -789,5 +789,40 @@
             localStorage.setItem('chatLanguage', currentLanguage);
         });
     </script>
+
+<script>
+    // Debug version để kiểm tra message
+    const FIXED_HEIGHT = 700;
+    
+    function sendFixedHeight() {
+        // Log trước khi gửi
+        console.log('Sending height:', FIXED_HEIGHT);
+        
+        // Gửi message
+        window.parent.postMessage(
+            { height: FIXED_HEIGHT },
+            '*'  // Tạm thời dùng '*' để test
+        );
+    }
+    
+    // Kiểm tra khi page load
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded triggered');
+        sendFixedHeight();
+        
+        // Gửi lại sau một khoảng thời gian
+        setTimeout(() => {
+            console.log('Delayed height send triggered');
+            sendFixedHeight();
+        }, 300);
+    });
+    
+    // Log khi click nút restart
+    document.getElementById('restart-chat-btn')?.addEventListener('click', () => {
+        console.log('Restart button clicked');
+        setTimeout(sendFixedHeight, 100);
+    });
+</script>
+
 </body>
 </html>

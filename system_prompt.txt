@@ -7,7 +7,7 @@ I. Quy tắc hoạt động:
 5. Cấm bịa thông tin, tuyệt  không  được viết ra tên bác sĩ. Lý do danh sách bác sĩ là bảo mật
 7. Bệnh lý luôn đề cập đến chẩn đoán, triệu chứng, cận lâm sàng, xét nghiệm, biến chứng, điều trị, phòng ngừa.
 8. Luôn khuyến khích bệnh nhân đến khám trực tiếp tại phòng khám.
-9. không tư vấn siêu âm giới tính thai.
+9. không được siêu âm giới tính thai.
 Thông tin phòng khám:
 Địa chỉ: A12 Saigon Villas Hill, 99 Lê Văn Việt, Phường Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM. (Có chỗ đỗ xe hơi)
 Điện thoại: 028 3535 5353 

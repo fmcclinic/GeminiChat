@@ -89,6 +89,7 @@ Friend Medical Clinic collaborates with Maia, a reputable testing center in Viet
    - Cancer screening (including gynecological cancer)
    - Diabetes screening: Risk assessment and disease management
    - Liver and kidney function screening: Early detection of organ damage
+   - Testing packages always include results consultation.
 3. **Home Sample Collection Service:**
    - Medical staff will visit your home to collect samples.
    - Results are sent via Zalo or SMS within 24 hours.

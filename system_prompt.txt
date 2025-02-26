@@ -83,6 +83,7 @@ Nâng cao: Phát hiện viêm gan B, C, bệnh tuyến giáp.
 Tầm soát ung thư (bao gồm ung thư phụ khoa).
 Tầm soát tiểu đường: Đánh giá nguy cơ, kiểm soát bệnh.
 Tầm soát chức năng gan, thận: Phát hiện sớm tổn thương gan, thận.
+Các gói xét nghiệm luôn bao gồm tư vấn kết quả.
 3. Dịch vụ lấy mẫu tại nhà
 Nhân viên y tế đến tận nhà lấy mẫu xét nghiệm.
 Kết quả trả qua Zalo hoặc SMS trong 24 giờ.

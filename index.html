@@ -594,82 +594,86 @@
         }
         
         // Hàm gửi yêu cầu đến Gemini API và nhận phản hồi
-        async function getGeminiResponse() {
-            // Hiển thị trạng thái đang tải
-            const loadingId = 'loading-' + Date.now();
-            const loadingElement = document.createElement('div');
-            loadingElement.id = loadingId;
-            loadingElement.className = 'message system-message';
-            
-            const spinner = document.createElement('span');
-            spinner.className = 'loading-spinner';
-            loadingElement.appendChild(spinner);
-            
-            const loadingText = document.createTextNode(translations[currentLanguage].loadingMessage);
-            loadingElement.appendChild(loadingText);
-            
-            messagesDiv.appendChild(loadingElement);
-            
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-            const requestBody = {
-                contents: conversationHistory,
-                systemInstruction: {
-                    parts: [{
-                        text: systemPrompt
-                    }]
-                }
-            };
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const geminiResponse = data.candidates[0].content.parts[0].text;
-                
-                // Xóa thông báo đang tải
-                const loadingMsg = document.getElementById(loadingId);
-                if (loadingMsg) {
-                    messagesDiv.removeChild(loadingMsg);
-                }
-                
-                // Thêm phản hồi vào giao diện với xử lý Markdown
-                const messageElement = appendMessage(translations[currentLanguage].assistant, geminiResponse, true);
-                
-                // Thêm các nút thao tác
-                addActionsToMessage(messageElement);
-                
-                // Thêm phản hồi vào lịch sử cuộc trò chuyện
-                conversationHistory.push({
-                    role: "model",
-                    parts: [{
-                        text: geminiResponse
-                    }]
-                });
-                
-                // Tạo câu hỏi gợi ý sau khi bot trả lời
-                generateSuggestedQuestions(messageElement);
-            } catch (error) {
-                console.error('Error:', error);
-                
-                // Xóa thông báo đang tải
-                const loadingMsg = document.getElementById(loadingId);
-                if (loadingMsg) {
-                    messagesDiv.removeChild(loadingMsg);
-                }
-                
-                appendMessage(translations[currentLanguage].chatbot, translations[currentLanguage].errorMessage + error.message);
-            }
+// Hàm gửi yêu cầu đến Gemini API và nhận phản hồi
+async function getGeminiResponse() {
+    // Hiển thị trạng thái đang tải
+    const loadingId = 'loading-' + Date.now();
+    const loadingElement = document.createElement('div');
+    loadingElement.id = loadingId;
+    loadingElement.className = 'message system-message';
+    
+    const spinner = document.createElement('span');
+    spinner.className = 'loading-spinner';
+    loadingElement.appendChild(spinner);
+    
+    const loadingText = document.createTextNode(translations[currentLanguage].loadingMessage);
+    loadingElement.appendChild(loadingText);
+    
+    messagesDiv.appendChild(loadingElement);
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    const requestBody = {
+        contents: conversationHistory,
+        systemInstruction: {
+            parts: [{
+                text: systemPrompt
+            }]
         }
+    };
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const geminiResponse = data.candidates[0].content.parts[0].text;
+        
+        // Xóa thông báo đang tải
+        const loadingMsg = document.getElementById(loadingId);
+        if (loadingMsg) {
+            messagesDiv.removeChild(loadingMsg);
+        }
+        
+        // Thêm phản hồi vào giao diện với xử lý Markdown
+        const messageElement = appendMessage(translations[currentLanguage].assistant, geminiResponse, true);
+        
+        // Thêm các nút thao tác
+        addActionsToMessage(messageElement);
+        
+        // Thêm phản hồi vào lịch sử cuộc trò chuyện
+        conversationHistory.push({
+            role: "model",
+            parts: [{
+                text: geminiResponse
+            }]
+        });
+        
+        // Cuộn đến đầu tin nhắn mới thay vì cuối tin nhắn
+        messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Tạo câu hỏi gợi ý sau khi bot trả lời
+        generateSuggestedQuestions(messageElement);
+    } catch (error) {
+        console.error('Error:', error);
+        
+        // Xóa thông báo đang tải
+        const loadingMsg = document.getElementById(loadingId);
+        if (loadingMsg) {
+            messagesDiv.removeChild(loadingMsg);
+        }
+        
+        appendMessage(translations[currentLanguage].chatbot, translations[currentLanguage].errorMessage + error.message);
+    }
+}
         
         // Hàm tạo câu hỏi gợi ý
         async function generateSuggestedQuestions(messageElement) {

@@ -611,6 +611,14 @@ async function getGeminiResponse() {
     
     messagesDiv.appendChild(loadingElement);
     
+    // Cuộn đến thông báo đang tải để đảm bảo nó hiển thị
+    loadingElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Lưu vị trí cuộn sau khi hiển thị thông báo loading
+    // Đợi một chút để đảm bảo việc cuộn đã hoàn tất
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const currentScrollPosition = messagesDiv.scrollTop;
+    
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     const requestBody = {
         contents: conversationHistory,
@@ -657,8 +665,20 @@ async function getGeminiResponse() {
             }]
         });
         
-        // Cuộn đến đầu tin nhắn mới thay vì cuối tin nhắn
-        messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Đảm bảo chúng ta vẫn ở vị trí cuộn hiện tại
+        messagesDiv.scrollTop = currentScrollPosition;
+        
+        // Sau một khoảng thời gian nhỏ, cuộn xuống thêm 3 dòng (~100px)
+        setTimeout(() => {
+            // Chiều cao tương đương khoảng 5 dòng văn bản
+            const additionalScrollAmount = 150; 
+            
+            // Cuộn xuống thêm từ vị trí hiện tại
+            messagesDiv.scrollTo({
+                top: currentScrollPosition + additionalScrollAmount,
+                behavior: 'smooth'
+            });
+        }, 100);
         
         // Tạo câu hỏi gợi ý sau khi bot trả lời
         generateSuggestedQuestions(messageElement);

@@ -2,7 +2,7 @@
 
 // Hàm gọi API để lấy phản hồi từ Gemini
 export async function getGeminiResponse(apiKey, conversationHistory, systemPrompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
     const requestBody = {
         contents: conversationHistory,
         systemInstruction: {
@@ -26,7 +26,7 @@ export async function getGeminiResponse(apiKey, conversationHistory, systemPromp
 
 // Hàm gọi API để tạo câu hỏi gợi ý
 export async function generateSuggestedQuestions(apiKey, conversationHistory, suggestionsPrompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
     const requestBody = {
         contents: [
             ...conversationHistory,

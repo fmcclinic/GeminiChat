@@ -120,7 +120,7 @@ function sendHeightToParent() {
     
     // Gửi message cho cửa sổ cha
     window.parent.postMessage({ height: height }, '*');
-    console.log(`Sent height to parent: ${height}px`);
+    //console.log(`Sent height to parent: ${height}px`);
 }
 
 // Gửi chiều cao khi trang được tải xong

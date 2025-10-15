@@ -102,3 +102,35 @@ async function handleSendMessage() {
         appendMessage(t.chatbot, t.errorMessage + error.message, currentLanguage);
     }
 }
+
+// =================================================================
+// ==== PHỤC HỒI MÃ GỬI CHIỀU CAO CHO TRANG WEB MẸ ====
+// =================================================================
+
+/**
+ * Gửi chiều cao hiện tại của body đến cửa sổ cha (trang web lớn hơn).
+ * Trang web mẹ có thể lắng nghe sự kiện này để điều chỉnh chiều cao của iframe.
+ */
+function sendHeightToParent() {
+    // Lấy chiều cao thực tế của toàn bộ nội dung chatbot
+    const height = document.body.scrollHeight;
+    
+    // Gửi message cho cửa sổ cha
+    // window.parent là trang web đã nhúng iframe này vào
+    window.parent.postMessage({ height: height }, '*');
+    console.log(`Sent height to parent: ${height}px`);
+}
+
+// Gửi chiều cao khi trang được tải xong
+document.addEventListener('DOMContentLoaded', () => {
+    // Gửi lần đầu
+    sendHeightToParent();
+    
+    // Gửi lại sau một khoảng trễ nhỏ để đảm bảo mọi thứ đã render xong
+    setTimeout(sendHeightToParent, 300);
+});
+
+// Gửi lại chiều cao mỗi khi có tin nhắn mới hoặc cuộc trò chuyện được làm mới
+// để đảm bảo iframe luôn có kích thước đúng
+DOM.sendButton.addEventListener('click', () => setTimeout(sendHeightToParent, 100));
+DOM.newChatButton.addEventListener('click', () => setTimeout(sendHeightToParent, 100));

@@ -104,33 +104,42 @@ async function handleSendMessage() {
 }
 
 // =================================================================
-// ==== PHỤC HỒI MÃ GỬI CHIỀU CAO CHO TRANG WEB MẸ ====
+// ==== PHỤC HỒI MÃ GỬI CHIỀU CAO CHO TRANG WEB MẸ (PHIÊN BẢN SỬA LỖI) ====
 // =================================================================
 
 /**
- * Gửi chiều cao hiện tại của body đến cửa sổ cha (trang web lớn hơn).
- * Trang web mẹ có thể lắng nghe sự kiện này để điều chỉnh chiều cao của iframe.
+ * Gửi chiều cao của container chính đến cửa sổ cha (trang web lớn hơn).
  */
 function sendHeightToParent() {
-    // Lấy chiều cao thực tế của toàn bộ nội dung chatbot
-    const height = document.body.scrollHeight;
+    // Lấy phần tử container chính của chatbot
+    const container = document.querySelector('.container');
+    if (!container) return; // Dừng lại nếu không tìm thấy container
+
+    // Lấy chiều cao thực tế của container
+    const height = container.scrollHeight;
     
     // Gửi message cho cửa sổ cha
-    // window.parent là trang web đã nhúng iframe này vào
     window.parent.postMessage({ height: height }, '*');
     console.log(`Sent height to parent: ${height}px`);
 }
 
 // Gửi chiều cao khi trang được tải xong
 document.addEventListener('DOMContentLoaded', () => {
-    // Gửi lần đầu
-    sendHeightToParent();
-    
-    // Gửi lại sau một khoảng trễ nhỏ để đảm bảo mọi thứ đã render xong
-    setTimeout(sendHeightToParent, 300);
+    // Sử dụng một bộ đếm thời gian trễ hơn một chút để đảm bảo CSS đã được áp dụng
+    setTimeout(sendHeightToParent, 500);
 });
 
-// Gửi lại chiều cao mỗi khi có tin nhắn mới hoặc cuộc trò chuyện được làm mới
-// để đảm bảo iframe luôn có kích thước đúng
-DOM.sendButton.addEventListener('click', () => setTimeout(sendHeightToParent, 100));
+// Sử dụng MutationObserver để theo dõi mọi thay đổi trong DOM (tin nhắn mới,...)
+// và gửi lại chiều cao khi có thay đổi. Đây là cách hiệu quả nhất.
+const observer = new MutationObserver(() => {
+    sendHeightToParent();
+});
+
+// Bắt đầu theo dõi các thay đổi trong phần tin nhắn
+observer.observe(DOM.messagesDiv, {
+    childList: true, // theo dõi thêm/xóa tin nhắn
+    subtree: true    // theo dõi các thay đổi trong tin nhắn
+});
+
+// Gửi lại chiều cao khi bắt đầu cuộc trò chuyện mới
 DOM.newChatButton.addEventListener('click', () => setTimeout(sendHeightToParent, 100));

@@ -13,7 +13,7 @@ I. Operating Rules:
 Clinic Information:
 - **Address:** A12 Saigon Villas Hill, 99 Le Van Viet, Tan Nhon Phu A Ward, Thu Duc City, Ho Chi Minh City. (Parking available for cars)
 - **Phone:** 028 3535 5353
-- **Google Maps:** [https://maps.app.goo.gl/6s5wcNHk76MQcAVB6](https://maps.app.goo.gl/6s5wcNHk76MQcAVB6) (Copy and paste into any browser to access the clinic's location.)
+- **Google Maps:** https://www.google.com/maps/place/Ph%C3%B2ng+Kh%C3%A1m+FMC+%2F+FMC+Clinic/@10.8447809,106.7899311,17z/data=!4m16!1m9!3m8!1s0x31752738a7dc0465:0xa6cf8ac82a3141e0!2sPh%C3%B2ng+Kh%C3%A1m+FMC+%2F+FMC+Clinic!8m2!3d10.8447809!4d106.792506!9m1!1b1!16s%2Fg%2F11wmjjwgp3!3m5!1s0x31752738a7dc0465:0xa6cf8ac82a3141e0!8m2!3d10.8447809!4d106.792506!16s%2Fg%2F11wmjjwgp3?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D (Copy and paste into any browser to access the clinic's location.)
 - **Website:** [https://friendmedicalclinic.com](https://friendmedicalclinic.com) (The official and only website of the clinic)
   - The clinic's website does not have subpages, subdirectories, parameters, or fragments.
   - Any other URL is invalid.

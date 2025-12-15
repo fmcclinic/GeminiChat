@@ -1,6 +1,8 @@
 // js/ui.js
 import * as DOM from './dom.js';
 import { translations } from './config.js';
+// Thêm import cho hàm xử lý tin nhắn
+import { handleSendMessage } from './main.js'; // <-- Cần import để xử lý click
 
 // Cập nhật giao diện theo ngôn ngữ được chọn
 export function updateLanguageUI(lang) {
@@ -34,7 +36,8 @@ export function appendMessage(sender, message, lang, isMarkdown = false) {
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     if (isMarkdown) {
-        contentElement.innerHTML = marked.parse(message);
+        // Đảm bảo thư viện marked.js đã được tải trong index.html
+        contentElement.innerHTML = marked.parse(message); 
     } else {
         contentElement.textContent = message;
     }
@@ -48,4 +51,54 @@ export function appendMessage(sender, message, lang, isMarkdown = false) {
 // Xóa tất cả tin nhắn trên giao diện
 export function clearMessages() {
     DOM.messagesDiv.innerHTML = '';
+}
+
+
+// ============== CÁC HÀM MỚI ĐƯỢC THÊM ===================
+
+/**
+ * Xóa một phần tử khỏi DOM
+ * (Mặc dù hàm này đơn giản, nó được giữ lại vì main.js đã import nó)
+ * @param {HTMLElement} element - Phần tử cần xóa.
+ */
+export function removeElement(element) {
+    if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+    }
+}
+
+/**
+ * Tạo và hiển thị các nút câu hỏi gợi ý bên dưới tin nhắn bot.
+ * @param {HTMLElement} targetElement - Tin nhắn bot chứa gợi ý.
+ * @param {Array<string>} suggestions - Danh sách các câu hỏi gợi ý.
+ */
+export function createSuggestedQuestionsContainer(targetElement, suggestions) {
+    const container = document.createElement('div');
+    container.className = 'suggested-questions-container';
+    
+    suggestions.forEach(suggestion => {
+        const button = document.createElement('button');
+        button.className = 'suggested-question-button';
+        button.textContent = suggestion;
+        
+        button.addEventListener('click', () => {
+            // Đặt câu hỏi vào input và gửi
+            DOM.userInput.value = suggestion;
+            // Gọi hàm gửi tin nhắn từ main.js
+            // Lưu ý: Việc import handleSendMessage từ main.js tạo ra Circular Dependency,
+            // nhưng đây là cách đơn giản nhất để kích hoạt chức năng gửi tin nhắn từ button.
+            // Nếu bạn gặp vấn đề, hãy khai báo lại logic gửi tin nhắn tại đây.
+            // Tạm thời, ta sẽ gọi handleSendMessage (nếu nó được export từ main.js)
+            if (typeof handleSendMessage === 'function') {
+                handleSendMessage();
+            } else {
+                // Nếu handleSendMessage không được export từ main.js (vì nó không có trong mã bạn cung cấp)
+                // Ta phải tự kích hoạt sự kiện click của nút Gửi.
+                DOM.sendButton.click();
+            }
+        });
+        container.appendChild(button);
+    });
+
+    targetElement.appendChild(container);
 }

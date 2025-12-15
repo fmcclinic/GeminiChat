@@ -1,13 +1,19 @@
 // js/api.js
+// Đã loại bỏ tham số apiKey và chuyển hướng đến Serverless Function /api/chat
 
-// Hàm gọi API để lấy phản hồi từ Gemini
-export async function getGeminiResponse(apiKey, conversationHistory, systemPrompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
+/**
+ * Hàm gọi API để lấy phản hồi từ Gemini (thông qua Serverless Function).
+ * @param {Array} conversationHistory - Lịch sử cuộc trò chuyện.
+ * @param {string} systemPrompt - Hướng dẫn hệ thống.
+ * @returns {Promise<string>} Phản hồi văn bản từ bot.
+ */
+export async function getGeminiResponse(conversationHistory, systemPrompt) {
+    const url = '/api/chat'; // <-- Gọi Serverless Function của Vercel
+    
+    // Gửi dữ liệu cần thiết (không bao gồm API key)
     const requestBody = {
-        contents: conversationHistory,
-        systemInstruction: {
-            parts: [{ text: systemPrompt }]
-        }
+        conversationHistory: conversationHistory,
+        systemPrompt: systemPrompt
     };
 
     const response = await fetch(url, {
@@ -17,33 +23,16 @@ export async function getGeminiResponse(apiKey, conversationHistory, systemPromp
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        // Ném lỗi chi tiết từ Serverless Function
+        throw new Error(`HTTP error! Status: ${response.status}. Details: ${errorData.details || errorData.error}`);
     }
 
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    // Serverless Function api/chat.js sẽ trả về { text: "..." }
+    return data.text; 
 }
 
-// Hàm gọi API để tạo câu hỏi gợi ý
-export async function generateSuggestedQuestions(apiKey, conversationHistory, suggestionsPrompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`; // <-- THAY ĐỔI Ở ĐÂY
-    const requestBody = {
-        contents: [
-            ...conversationHistory,
-            { role: "user", parts: [{ text: suggestionsPrompt }] }
-        ]
-    };
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
-}
+// Lưu ý: Tạm thời loại bỏ hàm generateSuggestedQuestions vì nó có logic phức tạp
+// và có thể cần một Serverless Function riêng biệt (api/suggestions.js) hoặc được kết hợp trong api/chat.js.
+// Nếu bạn muốn triển khai tính năng này, bạn cần tạo thêm file Serverless Function cho nó.

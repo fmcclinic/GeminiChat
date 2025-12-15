@@ -1,0 +1,46 @@
+# ----------------------------------------------------------------------
+# 1. Thư mục và File được tạo tự động
+# ----------------------------------------------------------------------
+/node_modules
+/jspm_packages
+
+# Vercel: thư mục cache và file tạm thời
+.vercel
+/out
+
+# Build Artifacts / Kết quả Build (Thường là 'dist' hoặc 'build' cho Front-end)
+/dist
+/build
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ----------------------------------------------------------------------
+# 2. Bảo mật: Thông tin nhạy cảm (API Keys, Cấu hình cục bộ)
+# ----------------------------------------------------------------------
+# Biến môi trường cục bộ (chứa key thật)
+.env
+.env.local
+.env.*.local
+
+# File chứa API key cũ hoặc file template
+AI/apikey.txt
+
+# ----------------------------------------------------------------------
+# 3. Editors/IDE (Các file cấu hình riêng của cá nhân)
+# ----------------------------------------------------------------------
+# VSCode
+.vscode/
+
+# JetBrains IDEs (WebStorm, v.v.)
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

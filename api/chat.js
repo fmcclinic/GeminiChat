@@ -1,6 +1,6 @@
 // api/chat.js - Serverless Function (Node.js Environment)
 
-import { GoogleGenAI } from '@google/genai'; 
+const { GoogleGenAI } = require('@google/genai');
 
 // Key được đọc bảo mật từ Biến Môi Trường của Vercel (GEMINI_API_KEY)
 const apiKey = process.env.GEMINI_API_KEY; 

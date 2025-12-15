@@ -1,58 +1,61 @@
-// api/chat.js - Serverless Function (Node.js Environment)
+// api/chat.js
+import { GoogleGenAI } from '@google/genai';
 
-// SỬ DỤNG CÚ PHÁP REQUIRE THAY VÌ IMPORT để tránh lỗi module trên Vercel
-const { GoogleGenAI } = require('@google/genai');
+// 1. Cấu hình Model & Key
+// Lưu ý: Đổi tên model về gemini-1.5-flash hoặc gemini-2.0-flash-exp
+const MODEL_NAME = "gemini-1.5-flash"; 
 
-// Key được đọc bảo mật từ Biến Môi Trường của Vercel
-const apiKey = process.env.GEMINI_API_KEY; 
-const model = "gemini-2.5-flash"; 
-
-// Khởi tạo client
-const ai = apiKey ? new GoogleGenAI(apiKey) : null;
-
-/**
- * Handler chính cho Serverless Function.
- * Xử lý yêu cầu POST chứa lịch sử trò chuyện và system prompt.
- */
 export default async function handler(req, res) {
-    // 1. Kiểm tra phương thức HTTP
+    // 2. Chỉ chấp nhận phương thức POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    // 2. Kiểm tra API Key
-    if (!ai) {
-        console.error("Lỗi: GEMINI_API_KEY không được thiết lập trong biến môi trường Vercel.");
-        // Trả về lỗi 500 nếu key không được tìm thấy
-        return res.status(500).json({ error: 'Server configuration error: API Key not found.', details: 'Please check your Vercel Environment Variables.' });
+    // 3. Lấy API Key từ biến môi trường
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        console.error("CRITICAL: GEMINI_API_KEY is missing in Vercel Environment Variables.");
+        return res.status(500).json({ 
+            error: 'Server configuration error.', 
+            details: 'API Key not found. Please check Vercel Settings.' 
+        });
     }
 
     try {
+        // 4. Khởi tạo Client (Sử dụng cú pháp đúng cho SDK @google/genai)
+        // SDK mới yêu cầu truyền object { apiKey: ... }
+        const ai = new GoogleGenAI({ apiKey: apiKey });
+
         const { conversationHistory, systemPrompt } = req.body;
 
-        // 3. Kiểm tra dữ liệu đầu vào
-        if (!conversationHistory || typeof systemPrompt !== 'string') {
-            return res.status(400).json({ error: 'Missing required parameters.', details: 'Missing conversationHistory or systemPrompt in request body.' });
+        // Kiểm tra dữ liệu đầu vào
+        if (!conversationHistory || !systemPrompt) {
+            return res.status(400).json({ error: 'Missing conversationHistory or systemPrompt' });
         }
 
-        // 4. Gọi API Gemini
+        // 5. Gọi Gemini API
+        // Lưu ý: SDK @google/genai có cấu trúc gọi hàm khác một chút so với SDK cũ
         const response = await ai.models.generateContent({
-            model: model,
+            model: MODEL_NAME,
             contents: conversationHistory,
             config: {
-                systemInstruction: systemPrompt
+                systemInstruction: systemPrompt,
             }
         });
 
-        // 5. Trả về kết quả thành công
-        res.status(200).json({ text: response.text });
+        // 6. Trả về kết quả
+        // SDK mới trả về text trực tiếp trong response.text() hoặc property text tuỳ version, 
+        // nhưng thường là response.text
+        return res.status(200).json({ text: response.text });
 
     } catch (error) {
-        // 6. Xử lý lỗi từ Google API hoặc lỗi Server khác
-        console.error('Lỗi khi gọi Gemini API:', error);
-        res.status(500).json({ 
-            error: 'Internal Server Error while communicating with Gemini.', 
-            details: error.message || 'Unknown API error.'
+        console.error('Gemini API Error:', error);
+        
+        // Trả về lỗi chi tiết để dễ debug (có thể ẩn chi tiết khi production nếu cần)
+        return res.status(500).json({ 
+            error: 'Error processing request', 
+            details: error.message || 'Unknown error' 
         });
     }
 }

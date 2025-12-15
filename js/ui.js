@@ -1,7 +1,7 @@
 // js/ui.js
 import * as DOM from './dom.js';
 import { translations } from './config.js';
-// Import các hàm từ main.js để xử lý sự kiện click của nút gợi ý (Fix Circular Dependency)
+// Lỗi đã được sửa: Chỉ import handleSendMessage từ main.js
 import { handleSendMessage } from './main.js'; 
 
 // Cập nhật giao diện theo ngôn ngữ được chọn
@@ -36,8 +36,7 @@ export function appendMessage(sender, message, lang, isMarkdown = false) {
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     if (isMarkdown) {
-        // Đảm bảo thư viện marked.js đã được tải trong index.html
-        contentElement.innerHTML = marked.parse(message); 
+        contentElement.innerHTML = marked.parse(message);
     } else {
         contentElement.textContent = message;
     }
@@ -54,13 +53,13 @@ export function clearMessages() {
 }
 
 
-// ============== CÁC HÀM MỚI ĐƯỢC THÊM ===================
+// ============== CÁC HÀM HỖ TRỢ UI ===================
 
 /**
  * Xóa một phần tử khỏi DOM.
  * @param {HTMLElement} element - Phần tử cần xóa.
  */
-export function removeElement(element) { // <-- Đã thêm export
+export function removeElement(element) {
     if (element && element.parentNode) {
         element.parentNode.removeChild(element);
     }
@@ -68,10 +67,11 @@ export function removeElement(element) { // <-- Đã thêm export
 
 /**
  * Tạo và hiển thị các nút câu hỏi gợi ý bên dưới tin nhắn bot.
+ * Lưu ý: Hàm này hiện không được gọi trong main.js, nhưng được giữ lại cho tính năng tương lai.
  * @param {HTMLElement} targetElement - Tin nhắn bot chứa gợi ý.
  * @param {Array<string>} suggestions - Danh sách các câu hỏi gợi ý.
  */
-export function createSuggestedQuestionsContainer(targetElement, suggestions) { // <-- Đã thêm export
+export function createSuggestedQuestionsContainer(targetElement, suggestions) {
     const container = document.createElement('div');
     container.className = 'suggested-questions-container';
     
@@ -81,10 +81,10 @@ export function createSuggestedQuestionsContainer(targetElement, suggestions) { 
         button.textContent = suggestion;
         
         button.addEventListener('click', () => {
-            // Đặt câu hỏi vào input
+            // Đặt câu hỏi vào input và gửi
             DOM.userInput.value = suggestion;
-            // Gọi hàm gửi tin nhắn từ main.js (Bây giờ nó đã được export)
-            handleSendMessage();
+            // Gọi hàm gửi tin nhắn từ main.js
+            handleSendMessage(); 
         });
         container.appendChild(button);
     });

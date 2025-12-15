@@ -67,3 +67,4 @@ export default async function handler(req, res) {
         });
     }
 }
+// Lưu ý: Hàm generateSuggestedQuestions đã được loại bỏ để tránh lỗi.

@@ -1,8 +1,8 @@
 // js/ui.js
 import * as DOM from './dom.js';
 import { translations } from './config.js';
-// Thêm import cho hàm xử lý tin nhắn
-import { handleSendMessage } from './main.js'; // <-- Cần import để xử lý click
+// Import các hàm từ main.js để xử lý sự kiện click của nút gợi ý (Fix Circular Dependency)
+import { handleSendMessage } from './main.js'; 
 
 // Cập nhật giao diện theo ngôn ngữ được chọn
 export function updateLanguageUI(lang) {
@@ -57,11 +57,10 @@ export function clearMessages() {
 // ============== CÁC HÀM MỚI ĐƯỢC THÊM ===================
 
 /**
- * Xóa một phần tử khỏi DOM
- * (Mặc dù hàm này đơn giản, nó được giữ lại vì main.js đã import nó)
+ * Xóa một phần tử khỏi DOM.
  * @param {HTMLElement} element - Phần tử cần xóa.
  */
-export function removeElement(element) {
+export function removeElement(element) { // <-- Đã thêm export
     if (element && element.parentNode) {
         element.parentNode.removeChild(element);
     }
@@ -72,7 +71,7 @@ export function removeElement(element) {
  * @param {HTMLElement} targetElement - Tin nhắn bot chứa gợi ý.
  * @param {Array<string>} suggestions - Danh sách các câu hỏi gợi ý.
  */
-export function createSuggestedQuestionsContainer(targetElement, suggestions) {
+export function createSuggestedQuestionsContainer(targetElement, suggestions) { // <-- Đã thêm export
     const container = document.createElement('div');
     container.className = 'suggested-questions-container';
     
@@ -82,20 +81,10 @@ export function createSuggestedQuestionsContainer(targetElement, suggestions) {
         button.textContent = suggestion;
         
         button.addEventListener('click', () => {
-            // Đặt câu hỏi vào input và gửi
+            // Đặt câu hỏi vào input
             DOM.userInput.value = suggestion;
-            // Gọi hàm gửi tin nhắn từ main.js
-            // Lưu ý: Việc import handleSendMessage từ main.js tạo ra Circular Dependency,
-            // nhưng đây là cách đơn giản nhất để kích hoạt chức năng gửi tin nhắn từ button.
-            // Nếu bạn gặp vấn đề, hãy khai báo lại logic gửi tin nhắn tại đây.
-            // Tạm thời, ta sẽ gọi handleSendMessage (nếu nó được export từ main.js)
-            if (typeof handleSendMessage === 'function') {
-                handleSendMessage();
-            } else {
-                // Nếu handleSendMessage không được export từ main.js (vì nó không có trong mã bạn cung cấp)
-                // Ta phải tự kích hoạt sự kiện click của nút Gửi.
-                DOM.sendButton.click();
-            }
+            // Gọi hàm gửi tin nhắn từ main.js (Bây giờ nó đã được export)
+            handleSendMessage();
         });
         container.appendChild(button);
     });

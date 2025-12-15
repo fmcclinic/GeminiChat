@@ -1,11 +1,17 @@
 // js/main.js
 import { translations } from './config.js';
 import * as DOM from './dom.js';
-import { updateLanguageUI, appendMessage, clearMessages, createSuggestedQuestionsContainer, removeElement } from './ui.js';
+// Đã thêm createSuggestedQuestionsContainer và removeElement
+import { 
+    updateLanguageUI, 
+    appendMessage, 
+    clearMessages,
+    createSuggestedQuestionsContainer,
+    removeElement // Dù không dùng trực tiếp ở đây, vẫn cần import nếu ui.js export
+} from './ui.js';
 import { getGeminiResponse, generateSuggestedQuestions } from './api.js';
 
 // ---- STATE MANAGEMENT ----
-// Đã loại bỏ let apiKey = '';
 let systemPrompt = '';
 let currentLanguage = 'vi';
 let conversationHistory = [];
@@ -29,7 +35,7 @@ async function initializeChat() {
         // Hiển thị tin nhắn chào mừng
         appendMessage(t.chatbot, t.welcomeMessage, currentLanguage);
         
-        // Kích hoạt các nút sau khi tải xong (thêm logic này)
+        // Kích hoạt các nút sau khi tải xong
         DOM.sendButton.disabled = false;
         DOM.newChatButton.disabled = false;
         DOM.languageToggle.disabled = false;
@@ -41,20 +47,16 @@ async function initializeChat() {
         appendMessage(t.chatbot, t.errorLoadingConfig + error.message, currentLanguage);
     }
     
-    // Thiết lập Event Listeners (chuyển logic từ cuối file lên đây)
+    // Thiết lập Event Listeners
     setupEventListeners();
 }
 
 /**
- * Tải System Prompt (không tải API Key nữa).
+ * Tải System Prompt (Không tải API Key).
  */
 async function loadConfigurations() {
     // Đã xóa toàn bộ logic tải API key từ AI/apikey.txt
-    
-    // 1. Tải System Prompt (dựa trên ngôn ngữ hiện tại)
     await loadSystemPrompt();
-
-    // LƯU Ý QUAN TRỌNG: Key được xử lý an toàn trong Serverless Function (api/chat.js).
 }
 
 async function loadSystemPrompt() {
@@ -84,7 +86,11 @@ function setupEventListeners() {
 }
 
 // ---- HANDLER FUNCTIONS ----
-function startNewChat() {
+
+/**
+ * Xử lý sự kiện bắt đầu cuộc trò chuyện mới.
+ */
+export function startNewChat() { // <-- Đã thêm export
     clearMessages();
     conversationHistory = [];
     const t = translations[currentLanguage];
@@ -95,7 +101,10 @@ function startNewChat() {
     setUIState(false); 
 }
 
-function handleLanguageToggle() {
+/**
+ * Xử lý sự kiện chuyển đổi ngôn ngữ.
+ */
+export function handleLanguageToggle() { // <-- Đã thêm export
     currentLanguage = currentLanguage === 'vi' ? 'en' : 'vi';
     localStorage.setItem('chatLanguage', currentLanguage);
     updateLanguageUI(currentLanguage);
@@ -103,7 +112,10 @@ function handleLanguageToggle() {
     startNewChat();
 }
 
-async function handleSendMessage() {
+/**
+ * Xử lý sự kiện gửi tin nhắn.
+ */
+export async function handleSendMessage() { // <-- Đã thêm export
     const userText = DOM.userInput.value.trim();
     if (isProcessing || userText === '') return;
 
@@ -128,14 +140,13 @@ async function handleSendMessage() {
         
         // 5. Cập nhật tin nhắn bot
         loadingMessageElement.remove(); 
-        appendMessage(t.assistant, responseText, currentLanguage, true);
+        const lastBotMessageElement = appendMessage(t.assistant, responseText, currentLanguage, true); // Lưu lại element này
         
         // 6. Thêm tin nhắn bot vào lịch sử
         conversationHistory.push({ role: "model", parts: [{ text: responseText }] });
         
-        // 7. Tạo và hiển thị câu hỏi gợi ý (nếu cần, cần sửa lại hàm này)
-        // Lưu ý: Nếu bạn chưa có hàm createSuggestedQuestionsContainer trong ui.js, hãy bỏ qua dòng này hoặc thêm nó vào.
-        // await handleSuggestedQuestions(responseText, lastBotMessageElement); 
+        // 7. Tạo và hiển thị câu hỏi gợi ý
+        await handleSuggestedQuestions(responseText, lastBotMessageElement); 
 
     } catch (error) {
         console.error('Lỗi khi gọi API:', error);
@@ -150,12 +161,53 @@ async function handleSendMessage() {
     }
 }
 
-// Hàm hỗ trợ vô hiệu hóa/kích hoạt UI
+/**
+ * Xử lý việc tạo lại và hiển thị câu hỏi gợi ý.
+ */
+async function handleSuggestedQuestions(botResponseText, targetElement) {
+    const t = translations[currentLanguage];
+    
+    // Xóa container gợi ý cũ (nếu có)
+    const existingContainer = targetElement.querySelector('.suggested-questions-container');
+    if (existingContainer) existingContainer.remove();
+
+    // Chuẩn bị prompt cho gợi ý
+    const suggestionsPrompt = `Dựa trên phản hồi cuối cùng này: "${botResponseText}", hãy tạo ra 3-4 câu hỏi gợi ý liên quan mà người dùng có thể hỏi tiếp. Trả lời chỉ bằng danh sách các câu hỏi, mỗi câu hỏi trên một dòng, không có số thứ tự hay ký hiệu.`;
+    
+    // 1. Hiển thị thông báo đang tải gợi ý
+    const loadingSuggestionsElement = appendMessage(t.chatbot, t.loadingSuggestions, currentLanguage);
+    loadingSuggestionsElement.className = 'message system-message loading-suggestions';
+
+    try {
+        // 2. Gọi API để tạo gợi ý (sử dụng hàm generateSuggestedQuestions đã import)
+        // Lưu ý: Tùy theo logic của api/chat.js (hoặc api/suggestions.js)
+        const suggestionsText = await generateSuggestedQuestions(conversationHistory, suggestionsPrompt);
+        
+        // 3. Xử lý kết quả và hiển thị
+        loadingSuggestionsElement.remove();
+        if (suggestionsText) {
+            const suggestions = suggestionsText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+            createSuggestedQuestionsContainer(targetElement, suggestions);
+        } else {
+            // Hiển thị thông báo không có gợi ý nếu API trả về rỗng
+            // appendMessage(t.chatbot, t.noSuggestions, currentLanguage); // Tắt thông báo này để UI sạch hơn
+        }
+    } catch (error) {
+        console.error('Lỗi khi tạo câu hỏi gợi ý:', error);
+        loadingSuggestionsElement.remove();
+        // Không cần hiển thị lỗi nặng, chỉ bỏ qua gợi ý
+    }
+}
+
+/**
+ * Thiết lập trạng thái UI (vô hiệu hóa/kích hoạt input/button).
+ * @param {boolean} disabled - Trạng thái vô hiệu hóa.
+ */
 function setUIState(disabled) {
     DOM.sendButton.disabled = disabled;
     DOM.userInput.disabled = disabled;
-    // DOM.languageToggle.disabled = disabled; // Có thể giữ lại để người dùng vẫn đổi được ngôn ngữ
-    // DOM.newChatButton.disabled = disabled; // Có thể giữ lại để người dùng vẫn bắt đầu chat mới
+    // DOM.languageToggle.disabled = disabled; // Giữ nguyên, không vô hiệu hóa
+    // DOM.newChatButton.disabled = disabled; // Giữ nguyên, không vô hiệu hóa
 }
 
 

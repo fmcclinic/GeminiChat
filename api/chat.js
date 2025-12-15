@@ -1,9 +1,6 @@
 // api/chat.js - Serverless Function (Node.js Environment)
 
-<<<<<<< HEAD
 // SỬ DỤNG CÚ PHÁP REQUIRE THAY VÌ IMPORT để tránh lỗi module trên Vercel
-=======
->>>>>>> d10921e462c7d3f0ccb3d561f5abd2308d0d1cdd
 const { GoogleGenAI } = require('@google/genai');
 
 // Key được đọc bảo mật từ Biến Môi Trường của Vercel

@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/chat.js": {
+      "runtime": "nodejs20.x",
+      "includeFiles": [
+        "node_modules/@google/genai/**"
+      ]
+    }
+  }
+}

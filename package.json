@@ -1,4 +1,7 @@
 {
+  "name": "geminichat",
+
+  "type": "module",
   "dependencies": {
     "@google/genai": "^1.33.0"
   }

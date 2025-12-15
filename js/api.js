@@ -23,6 +23,7 @@ export async function getGeminiResponse(conversationHistory, systemPrompt) {
     });
 
     if (!response.ok) {
+        // Đọc thông báo lỗi chi tiết từ Serverless Function
         const errorData = await response.json();
         // Ném lỗi chi tiết từ Serverless Function
         throw new Error(`HTTP error! Status: ${response.status}. Details: ${errorData.details || errorData.error}`);
@@ -33,6 +34,5 @@ export async function getGeminiResponse(conversationHistory, systemPrompt) {
     return data.text; 
 }
 
-// Lưu ý: Tạm thời loại bỏ hàm generateSuggestedQuestions vì nó có logic phức tạp
-// và có thể cần một Serverless Function riêng biệt (api/suggestions.js) hoặc được kết hợp trong api/chat.js.
-// Nếu bạn muốn triển khai tính năng này, bạn cần tạo thêm file Serverless Function cho nó.
+// Lưu ý: Hàm generateSuggestedQuestions đã được loại bỏ hoàn toàn để giải quyết lỗi.
+// Nếu muốn khôi phục, bạn cần thêm logic Serverless Function cho nó.
